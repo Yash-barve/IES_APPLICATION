@@ -23,9 +23,9 @@ public class PlanController {
 	@Autowired
 	private PlanService planService;
 
-	@PostMapping("/createplan")
-	public ResponseEntity<String> createPlan(@RequestBody PlansEntity entity) {
-		String success = planService.upsertPlan(entity);
+	@PostMapping("/createplan/{id}")
+	public ResponseEntity<String> createPlan(@RequestBody PlansEntity entity ,@PathVariable Integer id) {
+		String success = planService.upsertPlan(entity, id);
 		return new ResponseEntity<>(success, HttpStatus.OK);
 	}
 
@@ -61,7 +61,7 @@ public class PlanController {
 	public ResponseEntity<?> updatePlan(@PathVariable Integer id, @RequestBody PlansEntity entity) {
 		try {
 			PlansEntity existId = planService.getById(id);
-			planService.upsertPlan(entity);
+			planService.upsertPlan(entity,id);
 			return new ResponseEntity<>(HttpStatus.OK);
 		} catch (NoSuchElementException e) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);

@@ -1,9 +1,12 @@
 package com.main.entity;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -15,9 +18,15 @@ import javax.persistence.Table;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-@Data
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "IES_USERS_TBL")
 public class AdminEntity {
@@ -45,13 +54,20 @@ public class AdminEntity {
 	private String status;
 	
 	@CreationTimestamp
+	@Column(updatable = false)
 	private LocalDate createdate;
 	
 	@UpdateTimestamp
+	@Column(insertable = false)
 	private LocalDate updatedate;
 	
+	@JsonIgnore
 	@OneToMany(mappedBy = "plan" ,cascade = CascadeType.ALL,fetch = FetchType.EAGER)
 	private List<PlansEntity> plans;
+	
+	@JsonIgnore
+	@OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER,mappedBy = "user")
+	private Set<RolesManagerEntity> userRoles = new HashSet<>();
 
 	
 }

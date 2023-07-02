@@ -1,14 +1,18 @@
-package com.main.service;
+package com.main.serviceimpl;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.main.constants.Appconstants;
 import com.main.entity.AdminEntity;
+import com.main.entity.RolesManagerEntity;
 import com.main.repo.AdminRepo;
+import com.main.repo.RoleRepo;
+import com.main.service.AdminService;
 import com.main.utils.PwdGenerator;
 import com.main.utils.SendMailing;
 
@@ -17,18 +21,26 @@ public class AdminServiceImpl implements AdminService {
 
 	@Autowired
 	private AdminRepo adminRepo;
-	
+
+	@Autowired
+	private RoleRepo roleRepo;
+
 	@Autowired
 	private SendMailing sendMailing;
 
 	@Override
-	public String upsert(AdminEntity entity) {
-		
+	public String upsert(AdminEntity entity, Set<RolesManagerEntity> userRoles) {
+
 		AdminEntity email = adminRepo.findByEmail(entity.getEmail());
-		
-		if(email != null) {
+
+		if (null != email) {
 			return Appconstants.KEY_UNI_EMAIL;
 		}
+
+		for (RolesManagerEntity ur : userRoles) {
+			roleRepo.save(ur.getRoles());
+		}
+		entity.getUserRoles().addAll(userRoles);
 
 		String tpass = PwdGenerator.PasswordGenerate();
 
@@ -36,9 +48,7 @@ public class AdminServiceImpl implements AdminService {
 		entity.setStatus(Appconstants.KEY_LOCK);
 		entity.setPassword(tpass);
 
-		adminRepo.save(entity);
-		
-		String to = entity.getEmail();	
+		String to = entity.getEmail();
 		String subject = Appconstants.KEY_UNL;
 		StringBuffer body = new StringBuffer("");
 
@@ -49,12 +59,20 @@ public class AdminServiceImpl implements AdminService {
 		body.append(Appconstants.KEY_LINK + to + Appconstants.KEY_CLICK);
 
 		sendMailing.sendMailPwd(subject, body.toString(), to);
+
+		adminRepo.save(entity);
 		return Appconstants.KEY_SUCC;
 	}
 
 	@Override
 	public List<AdminEntity> getAllRecords() {
-		return adminRepo.findAll();
+		List<AdminEntity> list = adminRepo.findAll();
+		if (!list.isEmpty()) {
+			return list;
+		} else {
+			return null;
+		}
+
 	}
 
 	@Override

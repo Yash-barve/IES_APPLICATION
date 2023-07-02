@@ -2,7 +2,7 @@ package com.main.constants;
 
 public class Appconstants {
 	
-	public static final String KEY_SUCC = "Success";
+	public static final String KEY_SUCC = "success ";
 	public static final String KEY_ACT = "ACTIVE";
 	public static final String KEY_LOCK = "LOCKED";
 	public static final String KEY_DEL = "deleted";

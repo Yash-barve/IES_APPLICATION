@@ -5,7 +5,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.main.binding.Forgot;
@@ -18,7 +17,7 @@ public class UserController {
 
 	@Autowired
 	private UserService userService;
-
+	
 	@PostMapping("/unlock")
 	public ResponseEntity<String> unlockStatus(@RequestBody UnlockForm form) {
 		String success = userService.unlock(form);
@@ -27,8 +26,13 @@ public class UserController {
 
 	@PostMapping("/login")
 	public ResponseEntity<String> loginUser(@RequestBody LoginForm form) {
-		String success = userService.login(form);
-		return new ResponseEntity<>(success, HttpStatus.OK);
+		String status = userService.login(form);
+		if (status.contains("success")) {
+//			planService.dashboardPage(null);
+			return new ResponseEntity<>(status, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(status, HttpStatus.BAD_REQUEST);
+		}
 	}
 
 	@PostMapping("/forgot")
